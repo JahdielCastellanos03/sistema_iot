@@ -1,0 +1,132 @@
+{% extends 'dashboard/base_n.html' %}
+{% load staticfiles %}
+
+{% block titulo %} {{dispositivo.nombre_de_dispositivo}} {% endblock %}
+
+{% block links_templates %}
+<link rel="stylesheet" href="{% static '/css/dashboard/tabla.css' %}">
+<link rel="stylesheet" href="{% static '/css/dashboard/formulario.css' %}">
+<link rel="stylesheet" href="{% static '/css/dashboard/ver_dispositivo.css' %}">
+<link rel="stylesheet" href="{% static '/css/modal.css' %}">
+{% endblock %}
+
+{% block usuario %} usuario {% endblock %}
+
+
+{% block titulo_cabecera %}
+{{dispositivo.nombre_de_dispositivo}}
+{% endblock %}
+
+
+{% block contenido %}
+<div class="contenedor-main">
+    <form action="{% url 'dashboard:modificar-dispositivo' dispositivo.id %}" class="formulario izquierda" method="POST">
+        {% csrf_token %}
+        {% include "dashboard/form_template.html" %}
+        <input type="submit" value="Guardar Cambios" class="boton boton-informacion">
+    </form>
+
+    <div class="contenedor-sensores">
+        {% if sensores %}
+            <table class="tabla">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Habilitado</th>
+                    <th>Opciones</th>
+                </tr>
+        
+                {% for sensor in sensores %}
+                    <tr>
+                        <td>{{sensor.nombre_de_sensor}}</td>
+                        <td>{{sensor.tipo}}</td>
+                        {% if sensor.esta_habilitado %}
+                            <td class="centrado"><input type="checkbox" name="habilitado" id="" checked disabled></td>  
+                        {% else %}
+                            <td class="centrado"><input type="checkbox" name="habilitado" id="" disabled></td>
+                        {% endif %}
+                        <td class="opciones"><a onclick="eliminarRegistro(this)" data-target="{{ sensor.id }}"><span class="ion-trash-a"></a></span></td>
+                    </tr>
+                {% endfor %}
+        
+            </table>
+
+            <div class="centrado">
+                <a href="{% url 'dashboard:form-sensor' dispositivo.id %}" class="boton boton-informacion">Nuevo Sensor</a>
+            </div>
+
+            <div id="avisoEliminar" class="modal advertencia">
+                <div class="dialogo-modal-reducido">
+                    <div class="encabezado-modal"></div>
+                    <div class="cuerpo-modal">
+                        <p>
+                            Esta por eliminar un sensor, esta acción no tiene modo de revertirse.
+                        </p>
+                    </div>
+                    <div class="pie-modal">
+                        <button class="boton" data-trigger="cerrar-modal" data-target="avisoEliminar">Cancelar</button>
+                        <button class="boton boton-advertencia" onclick="eliminar()">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+            
+
+        {% else %}
+            <h2 class="margen">{{dispositivo.nombre_de_dispositivo}} aun no cuenta con Sensores..</h2> 
+            <div class="centrado">
+                <a href="{% url 'dashboard:form-sensor' dispositivo.id %}" class="boton boton-informacion">Nuevo Sensor</a>
+            </div>
+        {% endif %}
+    </div>
+
+
+    
+</div>
+
+{% endblock %}
+
+
+{% block scripts_extra %}
+<script src="{% static '/js/arlibreria.js' %}"></script>
+<script src="{% static '/js/modal.js' %}"></script>
+
+<script>
+    var url = "";
+    var avisoE = new LIBRERIA.Modal("avisoEliminar");
+    function eliminarRegistro(boton){
+        url = "http://localhost:8000/dashboard/sensores/"
+        url += boton.dataset["target"] + "/eliminar";
+        console.log(url)
+        avisoE.abrir()
+    }
+    function eliminar(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                var mensaje = new LIBRERIA.Modal("mensaje");
+                mensaje.cuerpo.innerHTML = this.responseText;
+                mensaje.cuerpo.innerHTML += "<br>La página se refrescará en 3 segundos..." ;
+                mensaje.reducido();
+                if(this.status==200){
+                    mensaje.encabezado.innerHTML = "<h2>Estado: 200 Ok </h2>";
+                    mensaje.exito();
+                }else{
+                    mensaje.encabezado.innerHTML = "<h2>Estado:"+this.status+" </h2>";
+                    mensaje.peligro();
+                }
+                location.href = window.location.protocol +'//'+ window.location.host + window.location.pathname;
+                mensaje.abrir();
+                
+                setTimeout( function(){
+                    
+                    location.reload();
+                }, 3000)            
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
+        avisoE.cerrar();
+    }
+
+</script>
+{% endblock %}

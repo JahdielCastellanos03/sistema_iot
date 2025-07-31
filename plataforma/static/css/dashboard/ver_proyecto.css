@@ -1,0 +1,38 @@
+/*
+    Contenedor main (para dar propiedades flex)
+*/
+
+.contenedor-main{
+    margin-top: 20px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row; /* Safari 6.1+ */
+    flex-direction: row;
+    -webkit-flex-wrap: wrap; /* Safari 6.1+ */ 
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/*
+    =====================
+    Red
+    ======================
+*/
+
+#red{
+    margin-right: 10px;
+    width: 50%;
+    height: 400px;
+}
+
+
+@media screen and (max-width: 800px){
+    #red{width: 90%; margin-bottom: 50px}
+}
+@media screen and (max-width: 400px){
+    #red{width: 95%; margin-bottom: 50px}
+}
+
