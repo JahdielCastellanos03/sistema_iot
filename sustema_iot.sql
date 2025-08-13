@@ -336,6 +336,8 @@ INSERT INTO `dashboard_valor` VALUES (1,'2.5','2018-02-07 15:30:41',1),(2,'5.5',
 /*!40000 ALTER TABLE `dashboard_valor` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+
 --
 -- Table structure for table `django_admin_log`
 --
